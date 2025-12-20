@@ -1,87 +1,72 @@
-/* Container and Layout */
+/* Layout with Sidebar */
 .gallery-layout {
   display: flex;
-  flex-direction: row; 
+  flex-direction: row;
   gap: 20px;
   padding: 20px;
   min-height: 80vh;
 }
 
-/* Sidebar / Folder List */
+/* Sidebar Styling */
 .folder-sidebar {
-  width: 220px;
-  border-right: 1px solid #eee;
+  width: 200px;
+  border-right: 1px solid #ddd;
   padding-right: 15px;
 }
 
 .folder {
-  padding: 12px 15px;
-  margin-bottom: 8px;
-  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  background: #f8f9fa;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  background: #f1f3f4;
+  transition: 0.2s;
 }
 
-.folder:hover { background: #e9ecef; }
+.folder:hover { background: #e8eaed; }
 .folder.active { background: #007bff; color: white; }
 .folder.drag-hover { background: #28a745; color: white; transform: scale(1.05); }
 
-/* Grid for Photos */
+/* Grid Styling */
 .gallery-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
 }
 
-/* The Photo Card */
 .photo-card {
-  position: relative;
   background: white;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
-.photo-card:hover { transform: translateY(-5px); }
 
 .photo-card img {
   width: 100%;
   aspect-ratio: 1/1;
   object-fit: cover;
-  display: block;
 }
 
-/* Action Buttons (Download/Delete) */
 .photo-actions {
   display: flex;
-  padding: 10px;
-  justify-content: space-between;
-  background: #fff;
+  justify-content: space-around;
+  padding: 8px;
 }
 
 .btn-icon {
   background: none;
   border: none;
-  font-size: 1.2rem;
   cursor: pointer;
-  padding: 5px;
-  border-radius: 5px;
-  transition: background 0.2s;
+  font-size: 1.1rem;
+  color: #555;
 }
 
-.btn-icon:hover { background: #f0f0f0; }
 .delete-btn:hover { color: #dc3545; }
 
-/* Responsive (Mobile) Tweaks */
+/* Mobile View */
 @media (max-width: 768px) {
   .gallery-layout { flex-direction: column; }
-  
   .folder-sidebar {
     width: 100%;
     display: flex;
@@ -90,9 +75,5 @@
     padding-bottom: 10px;
     gap: 10px;
   }
-  
-  .folder {
-    flex: 0 0 auto; /* Stop folders from shrinking on mobile */
-    margin-bottom: 0;
-  }
+  .folder { flex: 0 0 auto; margin-bottom: 0; }
 }
