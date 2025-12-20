@@ -1,0 +1,98 @@
+/* Container and Layout */
+.gallery-layout {
+  display: flex;
+  flex-direction: row; 
+  gap: 20px;
+  padding: 20px;
+  min-height: 80vh;
+}
+
+/* Sidebar / Folder List */
+.folder-sidebar {
+  width: 220px;
+  border-right: 1px solid #eee;
+  padding-right: 15px;
+}
+
+.folder {
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #f8f9fa;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.folder:hover { background: #e9ecef; }
+.folder.active { background: #007bff; color: white; }
+.folder.drag-hover { background: #28a745; color: white; transform: scale(1.05); }
+
+/* Grid for Photos */
+.gallery-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+/* The Photo Card */
+.photo-card {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.photo-card:hover { transform: translateY(-5px); }
+
+.photo-card img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  display: block;
+}
+
+/* Action Buttons (Download/Delete) */
+.photo-actions {
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  background: #fff;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+
+.btn-icon:hover { background: #f0f0f0; }
+.delete-btn:hover { color: #dc3545; }
+
+/* Responsive (Mobile) Tweaks */
+@media (max-width: 768px) {
+  .gallery-layout { flex-direction: column; }
+  
+  .folder-sidebar {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    border-right: none;
+    padding-bottom: 10px;
+    gap: 10px;
+  }
+  
+  .folder {
+    flex: 0 0 auto; /* Stop folders from shrinking on mobile */
+    margin-bottom: 0;
+  }
+}
