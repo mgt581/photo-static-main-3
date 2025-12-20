@@ -3,27 +3,15 @@
     "public": ".",
     "ignore": [
       "firebase.json",
-      "**/node_modules/**"
-    ],
-    "headers": [
-      {
-        "source": "/.well-known/assetlinks.json",
-        "headers": [
-          { "key": "Content-Type", "value": "application/json" }
-        ]
-      }
+      "**/.*",
+      "**/node_modules/**",
+      "README_DEPLOY.txt",
+      "firebase-debug.log",
+      "s delete folder/**"
     ],
     "rewrites": [
       {
-        "source": "/.well-known/assetlinks.json",
-        "destination": "/.well-known/assetlinks.json"
-      },
-      {
-        "source": "/delete-account",
-        "destination": "/delete-account/index.html"
-      },
-      {
-        "source": "!**/*.{js,css,png,jpg,jpeg,json,svg,html}",
+        "source": "**",
         "destination": "/index.html"
       }
     ]
