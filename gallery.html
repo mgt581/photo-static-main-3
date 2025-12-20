@@ -1,143 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Your Gallery • AI Photo Studio</title>
-  <link rel="icon" type="image/png" href="/apple-touch-icon.png?v=3">
-
-  <style>
-    body { margin:0; font-family:ui-sans-serif,system-ui,-apple-system,sans-serif; background:#f9fafb; padding:20px; color:#111827; }
-    
-    header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
-    h2 { margin:0; font-size:24px; }
-
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      background-color: #4f46e5; color: white;
-      padding: 8px 16px; text-decoration: none; border-radius: 8px;
-      font-weight: 600; font-size: 14px; border: none; cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn:hover { background-color: #4338ca; }
-    .btn-outline { background: white; color: #374151; border: 1px solid #d1d5db; }
-    .btn-outline:hover { background: #f3f4f6; }
-
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-      gap:16px;
-    }
-    
-    .card {
-      background:white; border-radius:12px; padding:8px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.06);
-      transition: transform 0.2s; display:flex; flex-direction:column; gap:8px;
-    }
-    .card:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-
-    img {
-      width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px; background:#f3f4f6;
-    }
-    
-    .actions { display:flex; gap:4px; }
-    .btn-sm { flex:1; padding:6px; font-size:12px; text-align:center; }
-
-    #status { text-align:center; color:#6b7280; margin-top:40px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gallery | AI Photo Studio</title>
+    <link rel="stylesheet" href="gallery.css">
+    <link rel="stylesheet" href="nav.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dragging { opacity: 0.5; border: 2px dashed #007bff; }
+        #newFolderBtn {
+            margin-bottom: 15px; width: 100%; padding: 10px;
+            background: #28a745; color: white; border: none;
+            border-radius: 8px; cursor: pointer; font-weight: bold;
+        }
+    </style>
 </head>
-
 <body>
 
-  <header>
-    <h2>Your Gallery</h2>
-    <a href="index.html" class="btn btn-outline">← Back to Studio</a>
-  </header>
+<header style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+    <h2 style="margin:0;">Your Gallery</h2>
+    <a href="index.html" style="text-decoration: none; color: #007bff; font-weight: bold;">+ Back to Studio</a>
+</header>
 
-  <p id="status">Loading your saved images...</p>
-  <div id="gallery" class="grid"></div>
+<div class="gallery-layout">
+    <aside class="folder-sidebar">
+        <button id="newFolderBtn"><i class="fas fa-plus"></i> New Folder</button>
+        <div id="folderList"></div>
+    </aside>
 
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <main class="gallery-grid" id="galleryGrid"></main>
+</div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCM6r66kW9xkBA5rgVcz4sP57N2v2BMbkg",
-      authDomain: "ai-photo-studio-24354.firebaseapp.com",
-      projectId: "ai-photo-studio-24354",
-      storageBucket: "ai-photo-studio-24354.appspot.com",
-      messagingSenderId: "411346648650",
-      appId: "1:411346648650:web:5ecd86ffecd05472fab0b3",
-      measurementId: "G-R3G160W8BQ"
-    };
-    firebase.initializeApp(firebaseConfig);
+<script>
+    // These match the IDs in your other root files
+    let photos = JSON.parse(localStorage.getItem("studio_photos") || "[]");
+    let folders = JSON.parse(localStorage.getItem("studio_folders") || '["All Photos", "Favorites"]');
+    let currentFolder = "All Photos";
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-         document.getElementById("status").textContent = "Please sign in to view your gallery.";
-         return;
-      }
-      listenToGallery(user.uid);
-    });
-
-    function listenToGallery(uid) {
-      const galleryDiv = document.getElementById("gallery");
-      const status = document.getElementById("status");
-
-      // Listen to the user's gallery collection
-      db.collection("users")
-        .doc(uid)
-        .collection("gallery")
-        .orderBy("createdAt", "desc")
-        .onSnapshot(snap => {
-          if (snap.empty) {
-            status.textContent = "No images found. Go create some!";
-            galleryDiv.innerHTML = "";
-            return;
-          }
-
-          status.style.display = 'none'; // Hide loading text
-          galleryDiv.innerHTML = "";
-
-          snap.forEach(doc => {
-            const data = doc.data();
-            if (!data.url) return;
+    function render() {
+        const folderList = document.getElementById("folderList");
+        const galleryGrid = document.getElementById("galleryGrid");
+        
+        // Render Folders
+        folderList.innerHTML = "";
+        folders.forEach(f => {
+            const div = document.createElement("div");
+            div.className = `folder ${f === currentFolder ? 'active' : ''}`;
+            div.innerHTML = `<i class="fas fa-folder"></i> ${f}`;
+            div.onclick = () => { currentFolder = f; render(); };
             
+            // Drag and Drop Logic
+            div.ondragover = (e) => { e.preventDefault(); div.classList.add('drag-hover'); };
+            div.ondragleave = () => div.classList.remove('drag-hover');
+            div.ondrop = (e) => {
+                e.preventDefault();
+                const photoId = e.dataTransfer.getData("text");
+                const photo = photos.find(p => p.id === photoId);
+                if(photo) { photo.folder = f; save(); }
+            };
+            folderList.appendChild(div);
+        });
+
+        // Render Photos
+        galleryGrid.innerHTML = "";
+        const filtered = photos.filter(p => currentFolder === "All Photos" || p.folder === currentFolder);
+        
+        filtered.forEach(p => {
             const card = document.createElement("div");
-            card.className = "card";
+            card.className = "photo-card";
+            card.draggable = true;
+            card.ondragstart = (e) => e.dataTransfer.setData("text", p.id);
             
-            // Image
-            const img = document.createElement("img");
-            img.src = data.url;
-            img.loading = "lazy";
-            
-            // Download Button
-            const btn = document.createElement("a");
-            btn.className = "btn btn-sm";
-            btn.textContent = "Download";
-            btn.href = data.url;
-            btn.target = "_blank"; // Opens in new tab
-            btn.download = "my-ai-photo.png";
+            // Long Press Delete for Mobile
+            let timer;
+            card.ontouchstart = () => timer = setTimeout(() => { if(confirm("Delete?")) del(p.id); }, 750);
+            card.ontouchend = () => clearTimeout(timer);
 
-            card.appendChild(img);
-            card.appendChild(btn);
-            galleryDiv.appendChild(card);
-          });
-        }, error => {
-          console.error("Gallery error:", error);
-          if (error.code === 'permission-denied') {
-             status.textContent = "Permission error: Please update Firestore Rules in Console.";
-          } else {
-             status.textContent = "Error loading images.";
-          }
+            card.innerHTML = `
+                <img src="${p.src}">
+                <div class="photo-actions">
+                    <button class="btn-icon" onclick="window.open('${p.src}')"><i class="fas fa-download"></i></button>
+                    <button class="btn-icon delete-btn" onclick="del('${p.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            galleryGrid.appendChild(card);
         });
     }
-  </script>
 
+    function del(id) { photos = photos.filter(p => p.id !== id); save(); }
+    function save() { 
+        localStorage.setItem("studio_photos", JSON.stringify(photos)); 
+        localStorage.setItem("studio_folders", JSON.stringify(folders));
+        render(); 
+    }
+
+    document.getElementById("newFolderBtn").onclick = () => {
+        const n = prompt("Folder Name:");
+        if(n && !folders.includes(n)) { folders.push(n); save(); }
+    };
+
+    render();
+</script>
 </body>
 </html>
