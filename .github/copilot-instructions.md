@@ -99,8 +99,8 @@ AI Photo Studio is a client-side web application for AI-powered photo editing. I
 ## File Organization
 - Keep HTML files in root directory
 - Use descriptive filenames (e.g., `gallery.html`, `signin.html`)
-- CSS files use matching names (e.g., `gallery.css` for `gallery.html`)
-- JavaScript can be inline in HTML or separate `.js` files
+- CSS is primarily inline within `<style>` tags in HTML files; some pages have separate CSS files with matching names (e.g., `gallery.css` for `gallery.html`)
+- JavaScript is primarily inline within `<script>` tags in HTML files; some utility scripts are in separate `.js` files
 - Firebase configuration in `firebase.json`
 
 ## Common Patterns
