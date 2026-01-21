@@ -78,6 +78,7 @@
       <a href="signup.html" class="ghost" id="navSignUp">Sign Up</a>
       
       <span id="authStatus" class="muted" style="display:none"></span>
+      <span id="userStatusBadge" style="display:none; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 13px;"></span>
       <button id="btnLogout" class="ghost" style="display:none; background:#fee2e2; color:#991b1b;">Sign out</button>
     </div>
 
@@ -202,7 +203,6 @@
     // 3. APP VARIABLES & DOM
     const elStatus    = document.getElementById('authStatus');
     const btnLogout   = document.getElementById('btnLogout');
-    const elTrialLeft = document.getElementById('trialLeft');
     const navSignIn   = document.getElementById('navSignIn');
     const navSignUp   = document.getElementById('navSignUp');
     window.proEnabled = false;
@@ -247,10 +247,15 @@ function drawChecker() {
 }
 
 function stampWatermark() {
-  // ✅ IMPORTANT: Uses window.proEnabled to skip watermark for Owner Mode, Free Trials & Paid Subscriptions
-  // Watermark only appears for free users (no subscription, no active trial)
-  if (window.proEnabled) return;
-
+  console.log(`stampWatermark() called - window.proEnabled = ${window.proEnabled}`);
+  
+  if (window.proEnabled) {
+    console.log("✅ Watermark SKIPPED (Pro enabled)");
+    return;
+  }
+  
+  console.log("❌ Drawing watermark (Free user)");
+  
   const text = "AI Photo Studio — FREE";
   ctx.save();
   ctx.font = "bold 34px ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial";
@@ -340,23 +345,29 @@ const loadImage = (src) => new Promise((res, rej) => {
 
     async function refreshUserPlan() {
       const user = auth.currentUser;
+      const badge = document.getElementById('userStatusBadge');
       
       // 1. Not signed in → Free user → Show watermark
       if (!user) { 
-        elTrialLeft.style.display = 'none'; 
+        if (badge) badge.style.display = 'none';
         setPro(false); 
         return; 
       }
       
       // 2. 👑 OWNER MODE BYPASS (Your Master Key) → No watermark
       if (user.email && user.email.toLowerCase() === "alexbryant3234@gmail.com") {
-        elTrialLeft.textContent = '👑 Owner Mode';
-        elTrialLeft.style.display = 'inline-block';
+        if (badge) {
+          badge.textContent = '👑 Owner';
+          badge.style.display = 'inline-block';
+          badge.style.background = '#fef3c7';
+          badge.style.color = '#92400e';
+        }
+        console.log("✅ Owner mode active - watermark disabled");
         setPro(true); 
         return;
       }
 
-      // 3. Normal Subscription Check → No watermark for paid subscribers
+      // 3. Check Firestore for subscription/trial status
       try {
         const snap = await db.collection('users').doc(user.uid).get();
         let isPro = false;
@@ -371,30 +382,50 @@ const loadImage = (src) => new Promise((res, rej) => {
           }
         }
         
+        // 4. Paid subscriber → No watermark
         if (isPro) {
-          elTrialLeft.textContent = 'Pro Active';
-          elTrialLeft.style.display = 'inline-block';
-          setPro(true); // Paid subscriber → No watermark
+          if (badge) {
+            badge.textContent = '✅ Pro User';
+            badge.style.display = 'inline-block';
+            badge.style.background = '#d1fae5';
+            badge.style.color = '#065f46';
+          }
+          console.log("✅ Pro user - watermark disabled");
+          setPro(true);
           return;
         }
         
-        // 4. Trial Check → No watermark for active trials, watermark for expired/no trial
+        // 5. Active trial → No watermark
         if (trialEndMillis) {
           const leftMs = trialEndMillis - Date.now();
           if (leftMs > 0) {
             const days = Math.ceil(leftMs / 86400000);
-            elTrialLeft.textContent = `${days} day${days === 1 ? '' : 's'} left`;
-            elTrialLeft.style.display = 'inline-block';
-            setPro(true); // Active trial → No watermark
-          } else {
-            elTrialLeft.textContent = 'Trial ended';
-            elTrialLeft.style.display = 'inline-block';
-            setPro(false); // Expired trial → Show watermark (now free user)
+            if (badge) {
+              badge.textContent = `✅ ${days} day${days === 1 ? '' : 's'} left`;
+              badge.style.display = 'inline-block';
+              badge.style.background = '#dbeafe';
+              badge.style.color = '#1e40af';
+            }
+            console.log(`✅ Active trial (${days} days left) - watermark disabled`);
+            setPro(true);
+            return;
           }
-        } else {
-          elTrialLeft.style.display = 'none';
-          setPro(false); // No trial → Show watermark (free user)
         }
+        
+        // 6. Free user (no trial, no subscription) → Show watermark
+        if (badge) {
+          badge.textContent = '❌ Upgrade Now';
+          badge.style.display = 'inline-block';
+          badge.style.background = '#fee2e2';
+          badge.style.color = '#991b1b';
+          badge.style.cursor = 'pointer';
+          badge.onclick = () => {
+            document.querySelector('.pricing-row')?.scrollIntoView({ behavior: 'smooth' });
+          };
+        }
+        console.log("❌ Free user - watermark enabled");
+        setPro(false);
+        
       } catch (e) {
         console.error("Plan check error:", e);
         setPro(false);
@@ -422,6 +453,11 @@ const loadImage = (src) => new Promise((res, rej) => {
 
       // Run the detailed plan/owner check
       await refreshUserPlan();
+
+      // Force redraw to apply/remove watermark
+      if (typeof Studio !== 'undefined' && Studio.redraw) {
+        Studio.redraw();
+      }
     });
 
     if(btnLogout) btnLogout.onclick = () => auth.signOut();
