@@ -205,7 +205,7 @@
     const elTrialLeft = document.getElementById('trialLeft');
     const navSignIn   = document.getElementById('navSignIn');
     const navSignUp   = document.getElementById('navSignUp');
-    let proEnabled    = false;
+    window.proEnabled = false;
 
     const $status = document.getElementById('status');
     const stage   = document.getElementById('stage');
@@ -545,7 +545,7 @@ const loadImage = (src) => new Promise((res, rej) => {
       async function ensureHdAllowed(){
         // Simple client-side check is good enough for a client-side app
         // You can keep the functions check if you require a server-side gate
-        return proEnabled; 
+        return window.proEnabled; 
       }
 
       async function removeBg(){
