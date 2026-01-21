@@ -476,7 +476,11 @@ const loadImage = (src) => new Promise((res, rej) => {
     // 6. GALLERY SAVING
     async function saveToGalleryIfSignedIn(blob, type){
       const user = auth.currentUser;
-      if (!user) return; 
+      if (!user) {
+        console.warn("User not authenticated. Saving to local gallery only.");
+        toast("⚠️ Sign in to save to cloud gallery");
+        return;
+      }
 
       toast("☁️ Auto-saving to Gallery..."); 
 
@@ -493,9 +497,10 @@ const loadImage = (src) => new Promise((res, rej) => {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
         
+        console.log("✅ Image successfully saved to Firebase Storage:", url);
         toast("✅ Image saved to Gallery!"); 
       } catch (e) {
-        console.error("Cloud auto-save failed:", e.code, e.message);
+        console.error("Cloud auto-save failed:", e.code, e.message, e);
         
         // Fallback: try saving to local gallery storage
         try {
@@ -508,6 +513,7 @@ const loadImage = (src) => new Promise((res, rej) => {
               folder: "All Photos"
             });
             localStorage.setItem("studio_photos", JSON.stringify(localPhotos));
+            console.log("✅ Fallback: Image saved to local storage");
           };
           reader.readAsDataURL(blob);
           toast("⚠️ Saved locally (cloud unavailable)");

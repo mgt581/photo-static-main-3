@@ -15,5 +15,14 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "storage": [
+    {
+      "bucket": "ai-photo-studio-24354.firebasestorage.app",
+      "rules": "storage.rules"
+    }
+  ],
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }
