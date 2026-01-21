@@ -1,6 +1,6 @@
 /**
  * Gallery Component
- * Fetches images from Firebase Firestore 'photos' collection
+ * Fetches images from Firebase Firestore users/{userId}/gallery subcollection
  * Displays in a responsive grid layout with loading states
  */
 
@@ -9,14 +9,24 @@ class Gallery {
     this.container = document.getElementById(containerId);
     this.photos = [];
     this.isLoading = false;
+    this.currentUser = null;
     this.db = firebase.firestore();
+    this.auth = firebase.auth();
     this.init();
   }
 
   async init() {
     this.renderLoadingState();
-    await this.fetchPhotos();
-    this.render();
+    // Wait for auth state to be determined
+    this.auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        this.renderError('Please sign in to view your gallery');
+        return;
+      }
+      this.currentUser = user;
+      await this.fetchPhotos();
+      this.render();
+    });
   }
 
   renderLoadingState() {
@@ -31,7 +41,17 @@ class Gallery {
   async fetchPhotos() {
     try {
       this.isLoading = true;
-      const snapshot = await this.db.collection('photos').get();
+      if (!this.currentUser) {
+        throw new Error('No user authenticated');
+      }
+      
+      // Fetch from users/{userId}/gallery subcollection
+      const userId = this.currentUser.uid;
+      const snapshot = await this.db
+        .collection('users')
+        .doc(userId)
+        .collection('gallery')
+        .get();
       
       this.photos = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -39,7 +59,9 @@ class Gallery {
       }));
 
       if (this.photos.length === 0) {
-        console.log('No photos found in collection');
+        console.log(`No photos found in users/${userId}/gallery`);
+      } else {
+        console.log(`Fetched ${this.photos.length} photos from users/${userId}/gallery`);
       }
     } catch (error) {
       console.error('Error fetching photos:', error);
@@ -115,7 +137,18 @@ class Gallery {
   async deletePhoto(id) {
     if (confirm('Are you sure you want to delete this photo?')) {
       try {
-        await this.db.collection('photos').doc(id).delete();
+        if (!this.currentUser) {
+          throw new Error('No user authenticated');
+        }
+        
+        const userId = this.currentUser.uid;
+        await this.db
+          .collection('users')
+          .doc(userId)
+          .collection('gallery')
+          .doc(id)
+          .delete();
+        
         this.photos = this.photos.filter(p => p.id !== id);
         this.render();
       } catch (error) {
