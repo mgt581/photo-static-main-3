@@ -999,15 +999,30 @@ if ('serviceWorker' in navigator) {
 
 // ✅ Attach Save to Gallery Button
 document.getElementById('btnSaveGallery').addEventListener('click', () => {
+  // Check if user is signed in
+  const user = auth.currentUser;
+  if (!user) {
+    toast("⚠️ Please sign in to save to Gallery");
+    setTimeout(() => {
+      if (confirm("You must be signed in to save to Gallery. Would you like to sign in now?")) {
+        window.location.href = "signin.html";
+      }
+    }, 100);
+    return;
+  }
+
   stage.toBlob((blob) => {
-    if (! blob) return alert("No image to save.");
+    if (!blob) {
+      toast("❌ No image to save");
+      return;
+    }
 
     // Save to gallery (Firebase)
     saveToGalleryIfSignedIn(blob, "jpeg");
 
     // Also trigger device download (optional)
     const url = URL.createObjectURL(blob);
-    const a = document. createElement("a");
+    const a = document.createElement("a");
     a.href = url;
     a.download = "photo-studio.jpg";
     a.click();
