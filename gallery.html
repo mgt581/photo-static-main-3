@@ -20,90 +20,28 @@
         <div id="folderList"></div>
     </aside>
 
-    <main class="gallery-grid" id="galleryGrid"></main>
+    <main id="galleryGrid"></main>
 </div>
 
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
-    // --- PERSISTENCE LOGIC ---
-    // This ensures data is pulled from LocalStorage on load
-    let photos = JSON.parse(localStorage.getItem("studio_photos") || "[]");
-    let folders = JSON.parse(localStorage.getItem("studio_folders") || '["All Photos", "Favorites"]');
-    let currentFolder = "All Photos";
-
-    function saveToStorage() {
-        localStorage.setItem("studio_photos", JSON.stringify(photos));
-        localStorage.setItem("studio_folders", JSON.stringify(folders));
-        render(); // Refresh the screen immediately after saving
-    }
-
-    function render() {
-        const folderList = document.getElementById("folderList");
-        const galleryGrid = document.getElementById("galleryGrid");
-        
-        // 1. Render Folders
-        folderList.innerHTML = "";
-        folders.forEach(f => {
-            const div = document.createElement("div");
-            div.className = `folder ${f === currentFolder ? 'active' : ''}`;
-            div.innerHTML = `<i class="fas fa-folder"></i> ${f}`;
-            div.onclick = () => { currentFolder = f; render(); };
-            
-            // Drag to folder logic
-            div.ondragover = (e) => { e.preventDefault(); div.classList.add('drag-hover'); };
-            div.ondragleave = () => div.classList.remove('drag-hover');
-            div.ondrop = (e) => {
-                e.preventDefault();
-                const photoId = e.dataTransfer.getData("text");
-                const photo = photos.find(p => p.id === photoId);
-                if(photo) { 
-                    photo.folder = f; 
-                    saveToStorage(); 
-                }
-            };
-            folderList.appendChild(div);
-        });
-
-        // 2. Render Photos
-        galleryGrid.innerHTML = "";
-        const filtered = photos.filter(p => currentFolder === "All Photos" || p.folder === currentFolder);
-        
-        filtered.forEach(p => {
-            const card = document.createElement("div");
-            card.className = "photo-card";
-            card.draggable = true;
-            card.ondragstart = (e) => e.dataTransfer.setData("text", p.id);
-
-            card.innerHTML = `
-                <img src="${p.src}">
-                <div class="photo-actions">
-                    <button class="btn-download" onclick="window.open('${p.src}')">
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                    <button class="btn-delete" onclick="deletePhoto('${p.id}')">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </div>
-            `;
-            galleryGrid.appendChild(card);
-        });
-    }
-
-    function deletePhoto(id) {
-        if(confirm("Are you sure you want to delete this photo?")) {
-            photos = photos.filter(p => p.id !== id);
-            saveToStorage(); // This is the 'Auto-Save' fix
-        }
-    }
-
-    document.getElementById("newFolderBtn").onclick = () => {
-        const name = prompt("Folder Name:");
-        if(name && !folders.includes(name)) {
-            folders.push(name);
-            saveToStorage();
-        }
-    };
-
-    render();
+  // --- FIREBASE CONFIG ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyCM6r66kW9xkBA5rgVcz4sP57N2v2BMbkg",
+    authDomain: "ai-photo-studio-24354.firebaseapp.com",
+    projectId: "ai-photo-studio-24354",
+    storageBucket: "ai-photo-studio-24354.firebasestorage.app",
+    messagingSenderId: "411346648650",
+    appId: "1:411346648650:web:aefd1b26027ed5e8fab0b3",
+    measurementId: "G-8TXC63YKPD"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
 </script>
+
+<script src="Gallery.js"></script>
 </body>
 </html>
