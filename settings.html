@@ -9,7 +9,7 @@
     body { margin:0; font-family:system-ui,-apple-system,sans-serif; background:#f9fafb; display:flex; justify-content:center; padding: 20px; min-height: 100vh; }
     
     /* Main Card */
-    .card { background:white; width:100%; max-width:480px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.06); overflow:hidden; display: flex; flex-direction: column; height: fit-content; margin-top: 20px; }
+    .card { background:white; width:100%; max-width:480px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.06); overflow:hidden; display: flex; flex-direction: column; height: fit-content; }
     
     /* Header */
     .header { padding: 24px 24px 10px 24px; border-bottom: 1px solid #f3f4f6; }
@@ -67,13 +67,13 @@
     .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
     .toggle input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #d1d5db; transition: .3s; border-radius: 34px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
     input:checked + .slider { background-color: #4f46e5; }
     input:checked + .slider:before { transform: translateX(20px); }
 
     /* Footer */
     .footer { padding: 24px; text-align: center; background: #f9fafb; border-top: 1px solid #e5e7eb; }
-    .back-link { text-decoration: none; color: #6b7280; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; transition: background 0.2s; }
+    .back-link { text-decoration: none; color: #6b7280; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; transition: background 0.15s; }
     .back-link:hover { background: #e5e7eb; color: #111827; }
   </style>
 </head>
@@ -169,7 +169,7 @@
       <div class="content">
         <div style="padding:10px 0;">
           <p style="font-size:14px; color:#374151; margin-bottom:12px;">Need assistance? We are here to help.</p>
-          <button class="btn btn-subtle" onclick="window.location.href='mailto:support@aiphotostudio.co.uk'">Contact Support</button>
+          <button class="btn btn-subtle" onclick="window.location.href='mailto:alex@bryantdigitalsolutions.com'">Contact Support</button>
           <div style="margin-top:16px; font-size:13px; color:#6b7280; text-align:center;">
             <p>Version: 2.5.0</p>
             <p>
