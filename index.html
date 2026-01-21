@@ -414,7 +414,7 @@ const loadImage = (src) => new Promise((res, rej) => {
         
         // 6. Free user (no trial, no subscription) → Show watermark
         if (badge) {
-          badge.innerHTML = '<a href="#pricing" style="color: inherit; text-decoration: none;">❌ Upgrade Now</a>';
+          badge.textContent = '❌ Upgrade Now';
           badge.style.display = 'inline-block';
           badge.style.background = '#fee2e2';
           badge.style.color = '#991b1b';
