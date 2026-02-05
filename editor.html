@@ -9,6 +9,12 @@
 
     <!-- ONNX RUNTIME -->
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 
 <body>
@@ -50,6 +56,25 @@
     <div class="loader"></div>
     <p>Processing…</p>
 </div>
+
+<script>
+  // Firebase Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCM6r66kW9xkBA5rgVcz4sP57N2v2BMbkg",
+    authDomain: "ai-photo-studio-24354.firebaseapp.com",
+    projectId: "ai-photo-studio-24354",
+    storageBucket: "ai-photo-studio-24354.firebasestorage.app",
+    messagingSenderId: "411346648650",
+    appId: "1:411346648650:web:5ecd86ffecd05472fab0b3",
+    measurementId: "G-R3G160W8BQ"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+  
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+</script>
 
 <script src="editor.js"></script>
 <script src="app.js"></script>
