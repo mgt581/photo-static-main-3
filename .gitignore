@@ -1,0 +1,14 @@
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+
+# System files
+.DS_Store
+
+# Deployment notes
+README_DEPLOY.txt
+firebaserc.txt
+
+# Git
+.git/
