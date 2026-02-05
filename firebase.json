@@ -9,12 +9,7 @@
       "firebase-debug.log",
       "s delete folder/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+    "cleanUrls": true
   },
   "storage": [
     {
