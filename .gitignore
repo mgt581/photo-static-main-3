@@ -9,6 +9,3 @@ firebase-debug.log
 # Deployment notes
 README_DEPLOY.txt
 firebaserc.txt
-
-# Git
-.git/
