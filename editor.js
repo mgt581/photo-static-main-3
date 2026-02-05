@@ -4,14 +4,16 @@ let originalImage = null;
 let processedImage = null;
 
 // Set active mode
-function setMode(mode) {
+function setMode(mode, event) {
   currentMode = mode;
   
   // Update active button
-  document.querySelectorAll('.mode-switcher button').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  event.target.classList.add('active');
+  if (event && event.target) {
+    document.querySelectorAll('.mode-switcher button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+  }
   
   // Update label
   const labels = {
@@ -68,21 +70,21 @@ document.getElementById('imageInput').addEventListener('change', async function(
     
     // Process image based on current mode
     if (currentMode === 'remove') {
-      removeBackground();
+      removeBackgroundFromImage();
     }
   };
   reader.readAsDataURL(file);
 });
 
 // Remove background using background-removal library
-async function removeBackground() {
+async function removeBackgroundFromImage() {
   if (!originalImage) return;
   
   showLoading(true);
   
   try {
     // Using the imgly background removal library loaded in HTML
-    if (typeof removeBackground !== 'undefined') {
+    if (typeof window.removeBackground !== 'undefined') {
       const blob = await fetch(originalImage).then(r => r.blob());
       const result = await window.removeBackground(blob);
       
@@ -194,5 +196,7 @@ function showLoading(show) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
-  setMode('remove');
+  // Set initial mode without event since page is loading
+  currentMode = 'remove';
+  document.getElementById('activeToolLabel').textContent = 'Remove Background';
 });
