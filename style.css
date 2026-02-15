@@ -1,4 +1,5 @@
-/* Modern Editor Styles */
+/* Modern Editor Styles - Premium Dark Theme */
+
 * {
   margin: 0;
   padding: 0;
@@ -7,40 +8,41 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: #0D47A1;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
   min-height: 100vh;
   padding: 20px;
 }
+
 .container {
   max-width: 900px;
   margin: 0 auto;
-  background: white;
+  background: #111827;
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
 }
 
 .header {
   text-align: center;
   margin-bottom: 30px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 1px solid #1f2937;
   padding-bottom: 20px;
 }
 
 .header h1 {
-  color: #333;
+  color: #f9fafb;
   font-size: 2rem;
   margin-bottom: 10px;
 }
 
 #activeToolLabel {
-  color: #2196F3;
+  color: #22d3ee;
   font-weight: 600;
   font-size: 1.1rem;
 }
 
 .back-btn {
-  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  background: linear-gradient(135deg, #22d3ee 0%, #6366f1 100%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -54,62 +56,54 @@ body {
 
 .back-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
 }
 
 .upload-box {
-  border: 3px dashed #2196F3;
+  border: 2px dashed #22d3ee;
   border-radius: 15px;
   padding: 60px 20px;
   text-align: center;
   cursor: pointer;
-  background: #f8f9ff;
+  background: #1f2937;
   transition: all 0.3s;
   margin-bottom: 30px;
 }
 
 .upload-box:hover {
-  background: #eef1ff;
-  border-color: #1976D2;
+  background: #0f172a;
+  border-color: #6366f1;
 }
 
 .upload-box p {
   font-size: 1.2rem;
-  color: #2196F3;
+  color: #22d3ee;
   font-weight: 600;
-}
-
-#imageInput {
-  display: none;
 }
 
 .image-preview {
   position: relative;
   margin-bottom: 30px;
   display: none;
-  background: #f9f9f9;
+  background: #1f2937;
   border-radius: 15px;
   padding: 20px;
   text-align: center;
-}
-
-.image-preview.active {
-  display: block;
 }
 
 #editorImage {
   max-width: 100%;
   height: auto;
   border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
 }
 
 .watermark {
   position: absolute;
   bottom: 30px;
   right: 30px;
-  background: rgba(33, 150, 243, 0.9);
-  color: white;
+  background: rgba(34, 211, 238, 0.9);
+  color: #111827;
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 600;
@@ -117,18 +111,10 @@ body {
   pointer-events: none;
 }
 
-.mode-switcher {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 30px;
-}
-
 .mode-switcher button {
-  background: white;
-  border: 2px solid #2196F3;
-  color: #2196F3;
+  background: #1f2937;
+  border: 2px solid #22d3ee;
+  color: #22d3ee;
   padding: 12px 20px;
   border-radius: 10px;
   font-size: 0.95rem;
@@ -139,27 +125,22 @@ body {
 
 .mode-switcher button:hover,
 .mode-switcher button.active {
-  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  background: linear-gradient(135deg, #22d3ee 0%, #6366f1 100%);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 8px 25px rgba(34, 211, 238, 0.4);
 }
 
 .tool-controls {
   margin-bottom: 20px;
   padding: 20px;
-  background: #f8f9ff;
+  background: #1f2937;
   border-radius: 12px;
-  display: none;
-}
-
-.tool-controls.active {
-  display: block;
 }
 
 .download-btn {
   width: 100%;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
   color: white;
   border: none;
   padding: 16px;
@@ -168,65 +149,18 @@ body {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  display: none;
-}
-
-.download-btn.active {
-  display: block;
 }
 
 .download-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
-}
-
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5);
 }
 
 .loader {
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #2196F3;
+  border: 5px solid #1f2937;
+  border-top: 5px solid #22d3ee;
   border-radius: 50%;
   width: 60px;
   height: 60px;
   animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-overlay p {
-  color: white;
-  font-size: 1.2rem;
-  margin-top: 20px;
-  font-weight: 600;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .container {
-    padding: 20px;
-  }
-  
-  .header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .mode-switcher button {
-    font-size: 0.85rem;
-    padding: 10px 15px;
-  }
 }
