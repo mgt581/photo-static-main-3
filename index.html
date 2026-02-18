@@ -26,10 +26,6 @@
     .ghost{background:#eef2ff;color:#4338ca;border:0;padding:8px 12px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-block;cursor:pointer;font-size:14px}
     .muted{color:#6b7280;font-size:13px}
     
-    /* Pricing Buttons */
-    .pricing-row { display: flex; gap: 8px; align-items: center; }
-    .btn-price { padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 700; color: white; transition: transform 0.1s; white-space: nowrap; }
-    .btn-price:active { transform: scale(0.97); }
     
     /* Responsive header */
     @media (max-width: 768px) {
@@ -85,19 +81,11 @@
       <a href="gallery.html" class="ghost">Gallery</a>
       <a href="settings.html" class="ghost">Settings</a>
       
-      <a href="signin.html" class="ghost" id="navSignIn">Sign In</a>
-      <a href="signup.html" class="ghost" id="navSignUp">Sign Up</a>
       
       <span id="authStatus" class="muted" style="display:none"></span>
       <span id="userStatusBadge" style="display:none; padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 13px;"></span>
       <button id="btnLogout" class="ghost" style="display:none; background:#fee2e2; color:#991b1b;">Sign out</button>
       
-      <div class="pricing-row">
-        <button id="btnDaily" class="btn-price" style="background: #6b7280;">Day Pass £1</button>
-        <button id="btnMonthly" class="btn-price" style="background: #2563eb;">Monthly £4.99</button>
-        <button id="btnTrialStart" class="btn-price" style="background: #16a34a;">Start Free Trial (Yearly)</button>
-      </div>
-    </div>
        
        <div class="wrap" ondragover="event.preventDefault()" ondrop="Studio.handleDrop(event)">
     <div class="card">
@@ -145,6 +133,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
   <script>
+    
     // 1. FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyCM6r66kW9xkBA5rgVcz4sP57N2v2BMbkg",
@@ -163,61 +152,13 @@
     const storage   = firebase.storage();
     const functions = firebase.functions ? firebase.functions() : null;
 
-    // 2. PAYMENT LINKS
-    const STRIPE_DAILY   = "https://buy.stripe.com/fZubJ30ki5EbdJNfj8d3i0a";
-    const STRIPE_MONTHLY = "https://buy.stripe.com/cNi8wRaYW9UraxB2wmd3i09";
-    const STRIPE_YEARLY  = "https://buy.stripe.com/4gM00l8QOfeL7lp9YOd3i08"; // Trial/Yearly link
+  
     
-    const btnDaily      = document.getElementById("btnDaily");
-    const btnMonthly    = document.getElementById("btnMonthly");
-    const btnTrialStart = document.getElementById("btnTrialStart");
-
-    if (btnDaily)   btnDaily.onclick   = () => window.location.href = STRIPE_DAILY;
-    if (btnMonthly) btnMonthly.onclick = () => window.location.href = STRIPE_MONTHLY;
-    // UPDATED: Now points to the yearly Stripe link as requested
-    if (btnTrialStart) btnTrialStart.onclick = () => window.location.href = STRIPE_YEARLY;
-
-    // --- CHECK FOR PAYMENT RETURN (Simulates Backend) ---
-    // User must set Stripe redirect to: https://aiphotostudio.co.uk/?paid=true
-    window.onload = function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('paid') === 'true' || urlParams.get('payment') === 'success') {
-        auth.onAuthStateChanged(user => {
-          if (user) {
-            activatePro('Paid Plan (Stripe)');
-            // Clean URL
-            window.history.replaceState({}, document.title, "/");
-          }
-        });
-      }
-      
-      if (urlParams.get("payment") === "cancel") {
-        toast("Payment cancelled");
-        window.history.replaceState({}, document.title, "/");
-      }
-    };
-
-    async function activatePro(type) {
-      const user = auth.currentUser;
-      if(!user) return;
-      
-      const ref = db.collection('users').doc(user.uid);
-      await ref.set({
-        tier: 'pro',
-        planType: type,
-        activatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      
-      toast(`✅ Plan activated! Pro features unlocked.`);
-      await refreshUserPlan();
-    }
 
     // 3. APP VARIABLES & DOM
     const elStatus    = document.getElementById('authStatus');
     const btnLogout   = document.getElementById('btnLogout');
-    const navSignIn   = document.getElementById('navSignIn');
-    const navSignUp   = document.getElementById('navSignUp');
-    window.proEnabled = false;
+
 
     const $status = document.getElementById('status');
     const stage   = document.getElementById('stage');
@@ -339,111 +280,7 @@ const loadImage = (src) => new Promise((res, rej) => {
       return mc;
     }
 
-    // 5. AUTH & STATE
-    function updatePlanUI() {
-      // Re-draw the canvas to apply/remove watermark based on window.proEnabled
-      // proEnabled is true for: owner mode, paid subscribers, and active trial users
-      // proEnabled is false for: free users (no subscription, no active trial)
-      if (typeof Studio !== 'undefined' && Studio.redraw) {
-        Studio.redraw();
-      }
-    }
-
-    function setPro(on) {
-      window.proEnabled = !!on;
-      updatePlanUI();
-      if (on) console.log("✅ Pro features active.");
-    }
-
-    async function refreshUserPlan() {
-      const user = auth.currentUser;
-      const badge = document.getElementById('userStatusBadge');
-      
-      // 1. Not signed in → Free user → Show watermark
-      if (!user) { 
-        if (badge) badge.style.display = 'none';
-        setPro(false); 
-        return; 
-      }
-      
-      // 2. 👑 OWNER MODE BYPASS (Your Master Key) → No watermark
-      if (user.email && user.email.toLowerCase() === "alexbryant3234@gmail.com") {
-        if (badge) {
-          badge.textContent = '👑 Owner';
-          badge.style.display = 'inline-block';
-          badge.style.background = '#fef3c7';
-          badge.style.color = '#92400e';
-        }
-        console.log("✅ Owner mode active - watermark disabled");
-        setPro(true); 
-        return;
-      }
-
-      // 3. Check Firestore for subscription/trial status
-      try {
-        const snap = await db.collection('users').doc(user.uid).get();
-        let isPro = false;
-        let trialEndMillis = null;
-
-        if (snap.exists) {
-          const d = snap.data() || {};
-          isPro = !!d.isPro || d.tier === 'pro';
-          
-          if (d.trial?.endsAt?.toMillis) {
-            trialEndMillis = d.trial.endsAt.toMillis();
-          }
-        }
-        
-        // 4. Paid subscriber → No watermark
-        if (isPro) {
-          if (badge) {
-            badge.textContent = '✅ Pro User';
-            badge.style.display = 'inline-block';
-            badge.style.background = '#d1fae5';
-            badge.style.color = '#065f46';
-          }
-          console.log("✅ Pro user - watermark disabled");
-          setPro(true);
-          return;
-        }
-        
-        // 5. Active trial → No watermark
-        if (trialEndMillis) {
-          const leftMs = trialEndMillis - Date.now();
-          if (leftMs > 0) {
-            const days = Math.ceil(leftMs / 86400000);
-            if (badge) {
-              badge.textContent = `✅ ${days} day${days === 1 ? '' : 's'} left`;
-              badge.style.display = 'inline-block';
-              badge.style.background = '#dbeafe';
-              badge.style.color = '#1e40af';
-            }
-            console.log(`✅ Active trial (${days} days left) - watermark disabled`);
-            setPro(true);
-            return;
-          }
-        }
-        
-        // 6. Free user (no trial, no subscription) → Show watermark
-        if (badge) {
-          badge.textContent = '❌ Upgrade Now';
-          badge.style.display = 'inline-block';
-          badge.style.background = '#fee2e2';
-          badge.style.color = '#991b1b';
-          badge.style.cursor = 'pointer';
-          badge.onclick = () => {
-            document.querySelector('.pricing-row')?.scrollIntoView({ behavior: 'smooth' });
-          };
-        }
-        console.log("❌ Free user - watermark enabled");
-        setPro(false);
-        
-      } catch (e) {
-        console.error("Plan check error:", e);
-        setPro(false);
-      }
-    }
-
+    
     // Main Auth Listener
     auth.onAuthStateChanged(async user => {
       if (!user) {
