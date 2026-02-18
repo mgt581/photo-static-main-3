@@ -817,6 +817,26 @@ async function applyInpaintHDPlus() {
   };
 })();
 
+<script>
+        function handleGalleryClick() {
+            if (window.AndroidInterface) {
+                window.AndroidInterface.openGallery(); 
+            } else {
+                window.location.href = "gallery.html";
+            }
+        }
+
+        function handleSettingsClick() {
+            if (window.AndroidInterface) {
+                window.AndroidInterface.openSettings();
+            } else {
+                window.location.href = "settings.html";
+            }
+        }
+    </script>
+</body>
+</html>
+    
 // ✅ FINAL APP SETUP
 drawChecker();
 
