@@ -115,11 +115,12 @@
 
      <div class="card actions">
   <div class="toolbar">
-    <!-- ✅ One button to rule them all -->
-    <button class="btn" id="btnSaveGallery">Save to Gallery</button>
+    <button class="btn" onclick="handleSaveGallery()">Save to Gallery</button>
+    <button class="btn" onclick="handleSaveDevice()">Save to Device</button>
   </div>
-  <p class="hint">When signed in, your downloaded images are also saved to your gallery and downloaded to your device.</p>
-</div>
+  <p class="hint">
+    When signed in, your downloaded images are also saved to your gallery and downloaded to your device.
+  </p>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -858,6 +859,40 @@ document.getElementById('btnSaveGallery').addEventListener('click', () => {
     URL.revokeObjectURL(url);
   }, "image/jpeg", 0.95);
 });
+
+    <script>
+function getCanvasImage() {
+    const canvas = document.getElementById("stage");
+    if (!canvas) return null;
+    return canvas.toDataURL("image/png");
+}
+
+function handleSaveGallery() {
+    const imageData = getCanvasImage();
+    if (!imageData) {
+        alert("No image available");
+        return;
+    }
+
+    if (window.AndroidBridge) {
+        AndroidBridge.saveToGallery(imageData);
+    }
+}
+
+function handleSaveDevice() {
+    const imageData = getCanvasImage();
+    if (!imageData) {
+        alert("No image available");
+        return;
+    }
+
+    if (window.AndroidBridge) {
+        AndroidBridge.saveToDevice(
+            imageData,
+            "AI_Photo_" + Date.now() + ".png"
+        );
+    }
+}
 </script>
 </body>
 </html>
