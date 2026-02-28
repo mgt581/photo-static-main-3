@@ -1,4 +1,4 @@
-// App initialization and global utilities
+// App initialization and global utilities 
 
 // Check if user is authenticated (if Firebase is available)
 function checkAuth() {
