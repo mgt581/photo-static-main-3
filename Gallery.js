@@ -1,5 +1,5 @@
 /**
- * Gallery Component
+ * Gallery Component 
  * Fetches images from Firebase Firestore users/{userId}/gallery subcollection
  * Displays in a responsive grid layout with loading states
  */
